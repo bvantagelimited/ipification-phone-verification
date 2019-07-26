@@ -1,0 +1,214 @@
+@import url('https://rsms.me/inter/inter.css');
+body * { font-family: 'Inter', sans-serif; }
+
+
+body 
+	margin  0
+	padding  0
+	background white
+
+#login{
+	position: relative;
+
+	.app-logo{
+		position: relative;
+		background-color: #F8F8FF;
+		text-align: center;
+		height: 301px;
+		padding-top: 34px;
+
+	}
+
+	.app-name{
+		padding: 40px 36px 0px 36px;
+
+		.short-title{
+			font-size: 16px;
+			color: #6D6D6D;
+		}
+
+		.title{
+			font-size: 26px;
+			font-weight: bold;
+		}
+	}
+	
+}
+
+.btn-block{
+	width: 100%;
+	padding: 0px 36px;
+	position: absolute;
+	bottom: 87px;
+	left: 0;
+
+	.phone-title{
+		color: #BCBCBC;
+	}
+
+	
+	.btn-login {
+		width: 100%;
+		border-radius: 5px;
+		font-size: 16px;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		height: 54px;
+		border:none;
+		padding: 10px 30px 10px 30px;
+		color: white;
+		background-color: #EEEEEE;
+		cursor: pointer;
+
+		&:focus{
+			outline: none;
+			-webkit-box-shadow: none;
+			box-shadow: none;
+		}
+		
+	}
+
+	&.valid{
+
+		.btn-login{
+			background-color: #007AFF;
+		}
+
+		.phone-valid{
+			position: absolute;
+			right: 0px;
+			background-image: url(../images/valid.svg);
+			width: 23px;
+			height: 23px;
+			background-repeat: no-repeat;
+			top: 8px;
+		}
+		
+	}
+
+	.btn-done {
+		width: 100%;
+		border-radius: 3px;
+		font-size: 16px;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		height: 54px;
+		border: 1px solid #007AFF;
+		padding: 10px 30px 10px 30px;
+		color: #007AFF;
+		background: white;  
+
+		&:focus{
+			outline: none;
+			-webkit-box-shadow: none;
+			box-shadow: none;
+		}
+		
+
+
+	}
+
+	.footer-block{
+		font-size: 14px;
+		text-align: center;
+		margin-top: 36px;
+		color: #B1B1B1;
+	}
+}
+
+#result{
+	position: relative;
+	
+	.user-logo{
+		position: relative;
+		background-color: #F8F8FF;
+		text-align: center;
+		height: 301px;
+
+		img{
+			margin-top: 92px;
+		}
+	}
+
+	.user-info{
+		padding: 35px;
+	}
+
+	.short-title{
+		color: #6D6D6D;
+		font-size: 16px;
+	}
+	.phone-title{
+		color: #BCBCBC;
+		font-size: 16px;
+		margin-top: 36px;
+	}
+
+	.user-phone{
+		padding: 5px 0px;
+		border-bottom: 1px solid #B7B7B7;
+		background-image: url(../images/valid.svg);
+		background-repeat: no-repeat;
+		background-position: right;
+	}
+
+	
+}
+
+.phone-input{
+	position: relative;
+	margin-bottom: 60px;
+
+	input {
+		background-color: transparent;
+		border: none;
+		border-bottom: 1px solid #B7B7B7;
+		border-radius: unset;
+		outline: none;
+		-webkit-box-shadow: none;
+		-moz-box-shadow: none;
+		box-shadow: none;
+		width: 100%;
+
+		color: #000000;
+		padding: 10px 0px;
+		font-size: 16px;
+
+		&:focus{
+			outline: none;
+			-webkit-box-shadow: none;
+			box-shadow: none;
+		}
+	}
+	::placeholder{
+			color: #BCBCBC;
+	}
+
+}
+
+@media (max-width: 768px) {
+	#login {
+		.form-login{
+			width:95%;
+		}
+	}
+
+	.container{
+		padding: 0px;
+	}
+}
+@media (min-width: 768px) {
+	#login {
+		width: 100%;
+	}
+
+	.container{
+		max-width: 390px;
+		height: 100vh;
+		position: relative;
+	}
+
+	body {
+		height  100vh
+	}
+}
