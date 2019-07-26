@@ -1,1 +1,1 @@
-Showcase that demonstrates IPification features and services# ipification-instant-access
+Showcase that demonstrates IPification features and services# ipification-phone-verification
