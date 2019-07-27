@@ -1,0 +1,8 @@
+{
+  "root_url": "http://localhost:3002",
+  "page_title": "IPification Phone Verify",
+  "realm": "realm_name",
+  "auth-server-url": "https://auth.server.com/auth",
+  "client_id": "",
+  "client_secret": ""
+}
