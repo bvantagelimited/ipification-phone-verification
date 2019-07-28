@@ -1,10 +1,12 @@
 
 extends layout
 
+
+
 block content
-	.container
-		.row
-			.col-sm-12
+	.d-flex.justify-content-center
+		.d-flex.align-items-end.flex-column.login-container
+			div
 				#login
 					.app-logo
 						img(src=`${ROOT_URL}/images/landing.svg`)
@@ -13,12 +15,12 @@ block content
 						.short-title Register with your
 						.title Internet Banking Application
 
-		.btn-block
-			div.phone-title Phone
-			.phone-input
-				.phone-valid
-				input.form-control(type='text')
-			button.btn-login(type='button') Continue
+						div.login-block
+							div.phone-title Phone
+							.phone-input
+								.phone-valid
+								input.form-control(type='number')
+							button.btn-login(type='button') Continue
 
 
 			

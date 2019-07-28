@@ -2,9 +2,9 @@ $(document).ready(function(){
   $(".phone-input input").on('keyup', function() {
     var value = this.value;
     if(value && value.length > 0){
-      $('.btn-block').addClass('valid')
+      $('.login-container').addClass('valid')
     }else{
-      $('.btn-block').removeClass('valid')
+      $('.login-container').removeClass('valid')
     }
   });
 
