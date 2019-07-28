@@ -49,6 +49,7 @@ module.exports = function(app) {
 		};
 
 		let authUrl = `${auth_server_url}/realms/${realm_name}/protocol/openid-connect/auth?` + querystring.stringify(params);
+		console.log("auth url: ", authUrl)
 		res.redirect(authUrl);
 
 	})
