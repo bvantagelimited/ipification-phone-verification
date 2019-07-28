@@ -5,22 +5,21 @@ extends layout
 
 block content
 	.d-flex.justify-content-center
-		.d-flex.align-items-end.flex-column.login-container
+		.d-flex.align-items-start.flex-column.login-container
+			.mb-auto(style="width: 100%")
+				.app-logo
+					img(src=`${ROOT_URL}/images/landing.svg`)
 			div
-				#login
-					.app-logo
-						img(src=`${ROOT_URL}/images/landing.svg`)
+				.app-name
+					.short-title Register with your
+					.title Internet Banking Application
 
-					.app-name
-						.short-title Register with your
-						.title Internet Banking Application
-
-						div.login-block
-							div.phone-title Phone
-							.phone-input
-								.phone-valid
-								input.form-control(type='number')
-							button.btn-login(type='button') Continue
+					div.login-block
+						div.phone-title Phone
+						.phone-input
+							.phone-valid
+							input.form-control(type='number')
+						button.btn-login(type='button') Continue
 
 
 			
