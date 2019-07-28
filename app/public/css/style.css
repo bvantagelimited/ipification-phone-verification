@@ -31,9 +31,8 @@ body {
 .btn-block {
   width: 100%;
   padding: 0px 36px;
-  position: absolute;
-  bottom: 87px;
-  left: 0;
+  position: relative;
+  padding-top: 87px;
 }
 .btn-block .phone-title {
   color: #bcbcbc;
