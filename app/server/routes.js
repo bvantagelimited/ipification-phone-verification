@@ -27,7 +27,9 @@ module.exports = function(app) {
 		
 		res.render('login', {
 			ROOT_URL: ROOT_URL,
-			page_title: page_title
+			page_title: page_title,
+			phone_number: req.query.phone_number,
+			error_message: req.query.error
 		});
 		
 	});
@@ -85,9 +87,10 @@ module.exports = function(app) {
 			const token_info = JSON.parse(ascii);
 			const {phone_number_verified, nonce} = token_info;
 			const nonce_info = nonce.split(':');
+			const phone_number = nonce_info[1];
 
 			if(!phone_number_verified){
-				res.redirect(`${HomeURL}?error=invalid phone number`);
+				res.redirect(`${HomeURL}?phone_number=${phone_number}&error=invalid phone number`);
 				return;
 			}
 
@@ -95,7 +98,7 @@ module.exports = function(app) {
 				ROOT_URL: ROOT_URL,
 				page_title: page_title,
 				home_url: HomeURL,
-				phone_number: nonce_info[1]
+				phone_number: phone_number
 			})
 
 		} catch (err) {

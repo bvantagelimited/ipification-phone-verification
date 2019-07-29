@@ -14,10 +14,11 @@ block content
 
 					div.login-block
 						.mui-textfield.mui-textfield--float-label
-							input(type='text')
+							input(type='text', value=phone_number)
 							label Phone
 							div.mt-2
 								span.text-danger.error-message
+									= error_message
 
 						button.btn-login(type='button') Continue
 
