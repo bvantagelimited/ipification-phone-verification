@@ -59,11 +59,10 @@ module.exports = function(app) {
 		const redirectClientURL = `${ROOT_URL}/ipification/callback`;
 
 		let tokenEndpointURL = auth_server_url + '/realms/' + realm_name + '/protocol/openid-connect/token';
-		let userEndpointURL = auth_server_url + '/realms/' + realm_name + '/protocol/openid-connect/userinfo';
 
 		if(req.query.error){
-			console.log(req.query)
-			res.redirect(`${HomeURL}?error=${req.query.error}`);
+			console.log(req.query.error)
+			res.redirect(`${HomeURL}`);
 			return;
 		}
 
@@ -79,13 +78,16 @@ module.exports = function(app) {
 
 		try {
 			const tokenResponse = await axios.post(tokenEndpointURL, qs.stringify(requestBody), config)
+			console.log('token data: ', tokenResponse.data);
 			const { access_token } = tokenResponse.data;
-			const userResponse = await axios.post(userEndpointURL, qs.stringify({access_token: access_token}))
-			const data = userResponse.data;
+			const token_encode = access_token.split('.')[1];
+			const ascii = Buffer.from(token_encode, 'base64').toString('ascii');
+			const token_info = JSON.parse(ascii);
+			const {phone_number_verified, nonce} = token_info;
+			const nonce_info = nonce.split(':');
 
-			console.log('token endpoint data: ', data);
-			if(!data.phone_number_verified){
-				res.redirect(`${HomeURL}?error=phone invalid`);
+			if(!phone_number_verified){
+				res.redirect(`${HomeURL}?error=invalid phone number`);
 				return;
 			}
 
@@ -93,7 +95,7 @@ module.exports = function(app) {
 				ROOT_URL: ROOT_URL,
 				page_title: page_title,
 				home_url: HomeURL,
-				phone_number: data.phone_number
+				phone_number: nonce_info[1]
 			})
 
 		} catch (err) {

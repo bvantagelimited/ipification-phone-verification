@@ -6,6 +6,7 @@ $(document).ready(function(){
     }else{
       $('.login-container').removeClass('valid')
     }
+    $('.error-message').html('')
   });
 
   $('.btn-login').on('click', function(){
@@ -17,6 +18,6 @@ $(document).ready(function(){
 
   var urlParams = new URLSearchParams(window.location.search);
   if(urlParams.has('error')){
-    alert("Your phone invalid")
+    $('.error-message').html(urlParams.get('error'))
   }
 })
