@@ -83,7 +83,11 @@ module.exports = function(app) {
 			const userResponse = await axios.post(userEndpointURL, qs.stringify({access_token: access_token}))
 			const data = userResponse.data;
 
-			debug('token endpoint data: %o', data);
+			console.log('token endpoint data: ', data);
+			if(!data.phone_number_verified){
+				res.redirect(`${HomeURL}?error=phone invalid`);
+				return;
+			}
 
 			res.render('result', {
 				ROOT_URL: ROOT_URL,

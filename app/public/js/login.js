@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  $(".phone-input input").on('keyup', function() {
+  $(".login-block input").on('keyup', function() {
     var value = this.value;
     if(value && value.length > 0){
       $('.login-container').addClass('valid')
@@ -9,7 +9,7 @@ $(document).ready(function(){
   });
 
   $('.btn-login').on('click', function(){
-    var value = $(".phone-input input").val();
+    var value = $(".login-block input").val();
     if(value && value.length > 0){
       window.location.href = window.ROOT_URL + '/authentication?phone=' + value;
     }
