@@ -7,6 +7,10 @@ const appConfig = require('config');
 const _ = require('lodash');
 const ROOT_URL = appConfig.get('root_url');
 const uuidv4 = require('uuid/v4');
+const {promisify} = require('util');
+const redis = require("redis");
+const redisClient = redis.createClient();
+const redisGetAsync = promisify(redisClient.get).bind(redisClient);
 
 const auth_server_url = appConfig.get('auth-server-url');
 const realm_name = appConfig.get('realm');
@@ -49,7 +53,7 @@ module.exports = function(app) {
 			nonce: `${nonce}:${phone}`,
 			login_hint: phone
 		};
-
+		redisClient.set(`${state}_phone`, phone, 'EX', 5);
 		let authUrl = `${auth_server_url}/realms/${realm_name}/protocol/openid-connect/auth?` + querystring.stringify(params);
 		console.log("auth url: ", authUrl)
 		res.redirect(authUrl);
@@ -57,14 +61,16 @@ module.exports = function(app) {
 	})
 
 	app.get('/ipification/callback', async function(req, res){
-		
+		const state = req.query.state;
 		const redirectClientURL = `${ROOT_URL}/ipification/callback`;
 
 		let tokenEndpointURL = auth_server_url + '/realms/' + realm_name + '/protocol/openid-connect/token';
 
 		if(req.query.error){
 			console.log(req.query.error)
-			res.redirect(`${HomeURL}`);
+			const phone_number = await redisGetAsync(`${state}_phone`);
+			// res.redirect(`${HomeURL}`);
+			res.redirect(`${HomeURL}?phone_number=${phone_number}&error=invalid phone number`);
 			return;
 		}
 
