@@ -13,6 +13,7 @@ html(lang="en")
 		meta(name='ROOT_URL', content=ROOT_URL)
 	body
 		div#ROOT_URL(style='display: none', url=ROOT_URL)
+		dev#debug(style='display: none', debug=debug)
 		block content
 		script(src="https://code.jquery.com/jquery-3.2.1.slim.min.js", integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN", crossorigin="anonymous")
 		script(src=`${ROOT_URL}/js/mui.min.js`)

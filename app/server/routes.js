@@ -29,24 +29,31 @@ module.exports = function(app) {
 	// main login page //
 	app.get('/login', async (req, res) => {
 		
+		const error_description = req.query.error_description;
 		const state = req.query.state || uuidv4();
-
+		const debug = req.query.debug || 0;
+		
 		res.render('login', {
 			ROOT_URL: ROOT_URL,
 			page_title: page_title,
 			state: state,
 			phone_number: req.query.phone_number,
-			error_message: req.query.error
+			error_message: req.query.error,
+			error_description: error_description,
+			debug: debug
 		});
 		
 	});
 
 	app.get('/authentication', (req, res) => {
-		const redirectClientURL = `${ROOT_URL}/ipification/callback`;
+		
 		
 		const nonce = uuidv4();
 		const state = req.query.state;
+		const debug = req.query.debug;
 		const phone = req.query.phone;
+
+		const redirectClientURL = `${ROOT_URL}/ipification/${debug}/callback`;
 
 		let params = {
 			response_type: 'code',
@@ -64,17 +71,20 @@ module.exports = function(app) {
 
 	})
 
-	app.get('/ipification/callback', async function(req, res){
+	// 381692023534
+
+	app.get('/ipification/:debug/callback', async function(req, res){
 		const state = req.query.state;
-		const redirectClientURL = `${ROOT_URL}/ipification/callback`;
+		const debug = req.params.debug;
+
+		const redirectClientURL = `${ROOT_URL}/ipification/${debug}/callback`;
 
 		let tokenEndpointURL = auth_server_url + '/realms/' + realm_name + '/protocol/openid-connect/token';
 
 		if(req.query.error){
 			console.log(req.query.error)
 			const phone_number = await redisGetAsync(`${state}_phone`);
-			// res.redirect(`${HomeURL}`);
-			res.redirect(`${HomeURL}?state=${state}&phone_number=${phone_number}&error=invalid phone number`);
+			res.redirect(`${HomeURL}?state=${state}&phone_number=${phone_number}&error_description=${req.query.error}&error=invalid phone number`);
 			return;
 		}
 
@@ -89,6 +99,7 @@ module.exports = function(app) {
 		const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 
 		try {
+			console.log('requestBody', requestBody);
 			const tokenResponse = await axios.post(tokenEndpointURL, qs.stringify(requestBody), config)
 			console.log('token data: ', tokenResponse.data);
 			const { access_token } = tokenResponse.data;
@@ -100,21 +111,36 @@ module.exports = function(app) {
 			const phone_number = nonce_info[1];
 
 			if(!phone_number_verified){
-				res.redirect(`${HomeURL}?state=${state}&phone_number=${phone_number}&error=invalid phone number`);
+				const params = {
+					state: state,
+					phone_number: phone_number,
+					error: 'invalid phone number'
+				}
+
+				const url = HomeURL + '?' + querystring.stringify(params);;
+				res.redirect(url);
 				return;
 			}
 
-			res.render('result', {
+			const response = {
 				ROOT_URL: ROOT_URL,
 				page_title: page_title,
 				home_url: HomeURL,
 				phone_number: phone_number,
 				state: state
-			})
+			}
+
+			if(debug == 1){
+				response.token_info = JSON.stringify({
+					phone_number_verified: phone_number_verified,
+				});
+			}
+
+			res.render('result', response)
 
 		} catch (err) {
 			console.error(err);
-			res.redirect(HomeURL);
+			res.redirect(`${HomeURL}?error_description=${err.message}`);
 		}
 
 		
