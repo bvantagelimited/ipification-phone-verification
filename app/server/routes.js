@@ -139,8 +139,8 @@ module.exports = function(app) {
 			res.render('result', response)
 
 		} catch (err) {
-			console.error(err);
-			res.redirect(`${HomeURL}?error_description=${err.message}`);
+			const phone_number = await redisGetAsync(`${state}_phone`);
+			res.redirect(`${HomeURL}?phone_number=${phone_number}&error_description=${err.message}`);
 		}
 
 		
