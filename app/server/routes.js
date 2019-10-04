@@ -29,7 +29,7 @@ module.exports = function(app) {
 	// main login page //
 	app.get('/login', async (req, res) => {
 		
-		const state = uuidv4();
+		const state = req.query.state || uuidv4();
 
 		res.render('login', {
 			ROOT_URL: ROOT_URL,
@@ -74,7 +74,7 @@ module.exports = function(app) {
 			console.log(req.query.error)
 			const phone_number = await redisGetAsync(`${state}_phone`);
 			// res.redirect(`${HomeURL}`);
-			res.redirect(`${HomeURL}?phone_number=${phone_number}&error=invalid phone number`);
+			res.redirect(`${HomeURL}?state=${state}&phone_number=${phone_number}&error=invalid phone number`);
 			return;
 		}
 
@@ -100,7 +100,7 @@ module.exports = function(app) {
 			const phone_number = nonce_info[1];
 
 			if(!phone_number_verified){
-				res.redirect(`${HomeURL}?phone_number=${phone_number}&error=invalid phone number`);
+				res.redirect(`${HomeURL}?state=${state}&phone_number=${phone_number}&error=invalid phone number`);
 				return;
 			}
 
