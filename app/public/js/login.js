@@ -20,8 +20,10 @@ $(document).ready(function(){
   $('.btn-login').on('click', function(){
     var state = $('.state-block').text();
     var value = $(".login-block input").val();
+    var debug = document.getElementById('debug').getAttribute('debug');
+
     if(value && value.length > 0){
-      window.location.href = window.ROOT_URL + '/authentication?phone=' + value + '&state=' + state;
+      window.location.href = window.ROOT_URL + '/authentication?phone=' + value + '&state=' + state + '&debug=' + debug;
     }
   })
 
