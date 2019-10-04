@@ -23,3 +23,7 @@ block content
 						button.btn-login(type='button') Continue
 					div.state-block
 						= state
+
+					if error_description
+						div.error-block
+							= error_description
