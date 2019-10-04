@@ -29,9 +29,12 @@ module.exports = function(app) {
 	// main login page //
 	app.get('/login', async (req, res) => {
 		
+		const state = uuidv4();
+
 		res.render('login', {
 			ROOT_URL: ROOT_URL,
 			page_title: page_title,
+			state: state,
 			phone_number: req.query.phone_number,
 			error_message: req.query.error
 		});
@@ -40,9 +43,10 @@ module.exports = function(app) {
 
 	app.get('/authentication', (req, res) => {
 		const redirectClientURL = `${ROOT_URL}/ipification/callback`;
-		const state = uuidv4();
+		
 		const nonce = uuidv4();
-		const phone = req.query.phone
+		const state = req.query.state;
+		const phone = req.query.phone;
 
 		let params = {
 			response_type: 'code',
@@ -104,7 +108,8 @@ module.exports = function(app) {
 				ROOT_URL: ROOT_URL,
 				page_title: page_title,
 				home_url: HomeURL,
-				phone_number: phone_number
+				phone_number: phone_number,
+				state: state
 			})
 
 		} catch (err) {

@@ -18,9 +18,10 @@ $(document).ready(function(){
   });
 
   $('.btn-login').on('click', function(){
+    var state = $('.state-block').text();
     var value = $(".login-block input").val();
     if(value && value.length > 0){
-      window.location.href = window.ROOT_URL + '/authentication?phone=' + value;
+      window.location.href = window.ROOT_URL + '/authentication?phone=' + value + '&state=' + state;
     }
   })
 
