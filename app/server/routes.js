@@ -32,6 +32,7 @@ module.exports = function(app) {
 		const error_description = req.query.error_description;
 		const state = req.query.state || uuidv4();
 		const debug = req.query.debug || 0;
+		const debug_info = req.query.debug_info;
 		
 		res.render('login', {
 			ROOT_URL: ROOT_URL,
@@ -40,7 +41,8 @@ module.exports = function(app) {
 			phone_number: req.query.phone_number,
 			error_message: req.query.error,
 			error_description: error_description,
-			debug: debug
+			debug: debug,
+			debug_info: debug_info
 		});
 		
 	});
@@ -77,6 +79,8 @@ module.exports = function(app) {
 		const state = req.query.state;
 		const debug = req.params.debug;
 
+		console.log('---> debug', debug);
+
 		const redirectClientURL = `${ROOT_URL}/ipification/${debug}/callback`;
 
 		let tokenEndpointURL = auth_server_url + '/realms/' + realm_name + '/protocol/openid-connect/token';
@@ -99,9 +103,9 @@ module.exports = function(app) {
 		const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 
 		try {
-			console.log('requestBody', requestBody);
+			console.log('---> requestBody', requestBody);
 			const tokenResponse = await axios.post(tokenEndpointURL, qs.stringify(requestBody), config)
-			console.log('token data: ', tokenResponse.data);
+			console.log('---> token data: ', tokenResponse.data);
 			const { access_token } = tokenResponse.data;
 			const token_encode = access_token.split('.')[1];
 			const ascii = Buffer.from(token_encode, 'base64').toString('ascii');
@@ -110,6 +114,10 @@ module.exports = function(app) {
 			const nonce_info = nonce.split(':');
 			const phone_number = nonce_info[1];
 
+			const debug_info = JSON.stringify({
+				phone_number_verified: phone_number_verified,
+			});
+
 			if(!phone_number_verified){
 				const params = {
 					state: state,
@@ -117,7 +125,9 @@ module.exports = function(app) {
 					error: 'invalid phone number'
 				}
 
-				const url = HomeURL + '?' + querystring.stringify(params);;
+				if(debug == 1) params.debug_info = debug_info;
+
+				const url = HomeURL + '?' + querystring.stringify(params);
 				res.redirect(url);
 				return;
 			}
@@ -130,11 +140,9 @@ module.exports = function(app) {
 				state: state
 			}
 
-			if(debug == 1){
-				response.token_info = JSON.stringify({
-					phone_number_verified: phone_number_verified,
-				});
-			}
+			if(debug == 1) response.debug_info = debug_info;
+
+			console.log('---> response', response)
 
 			res.render('result', response)
 
