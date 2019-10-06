@@ -68,7 +68,7 @@ module.exports = function(app) {
 		};
 		redisClient.set(`${state}_phone`, phone, 'EX', 5);
 		let authUrl = `${auth_server_url}/realms/${realm_name}/protocol/openid-connect/auth?` + querystring.stringify(params);
-		console.log("auth url: ", authUrl)
+		console.log("---> auth url: ", authUrl)
 		res.redirect(authUrl);
 
 	})
@@ -79,14 +79,14 @@ module.exports = function(app) {
 		const state = req.query.state;
 		const debug = req.params.debug;
 
-		console.log('---> debug', debug);
+		console.log('---> debug: ', debug);
 
 		const redirectClientURL = `${ROOT_URL}/ipification/${debug}/callback`;
 
 		let tokenEndpointURL = auth_server_url + '/realms/' + realm_name + '/protocol/openid-connect/token';
 
 		if(req.query.error){
-			console.log(req.query.error)
+			console.log('---> kc error: ', req.query.error)
 			const phone_number = await redisGetAsync(`${state}_phone`);
 			res.redirect(`${HomeURL}?state=${state}&phone_number=${phone_number}&error_description=${req.query.error}&error=invalid phone number`);
 			return;
@@ -103,9 +103,8 @@ module.exports = function(app) {
 		const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 
 		try {
-			console.log('---> requestBody', requestBody);
 			const tokenResponse = await axios.post(tokenEndpointURL, qs.stringify(requestBody), config)
-			console.log('---> token data: ', tokenResponse.data);
+			
 			const { access_token } = tokenResponse.data;
 			const token_encode = access_token.split('.')[1];
 			const ascii = Buffer.from(token_encode, 'base64').toString('ascii');
@@ -113,6 +112,8 @@ module.exports = function(app) {
 			const {phone_number_verified, nonce} = token_info;
 			const nonce_info = nonce.split(':');
 			const phone_number = nonce_info[1];
+
+			console.log('---> token info: ', token_info);
 
 			const debug_info = JSON.stringify({
 				phone_number_verified: phone_number_verified,
@@ -142,11 +143,10 @@ module.exports = function(app) {
 
 			if(debug == 1) response.debug_info = debug_info;
 
-			console.log('---> response', response)
-
 			res.render('result', response)
 
 		} catch (err) {
+			console.log('---> get token error: ', err.message);
 			const phone_number = await redisGetAsync(`${state}_phone`);
 			res.redirect(`${HomeURL}?phone_number=${phone_number}&error_description=${err.message}`);
 		}
