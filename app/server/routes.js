@@ -11,6 +11,7 @@ const {promisify} = require('util');
 const redis = require("redis");
 const redisClient = redis.createClient();
 const redisGetAsync = promisify(redisClient.get).bind(redisClient);
+const md5 = require('md5');
 
 const auth_server_url = appConfig.get('auth-server-url');
 const realm_name = appConfig.get('realm');
@@ -64,7 +65,8 @@ module.exports = function(app) {
 			redirect_uri: redirectClientURL,
 			state: state,
 			nonce: `${nonce}:${phone}`,
-			login_hint: phone
+			login_hint: phone,
+			deviceid: md5(phone)
 		};
 		redisClient.set(`${state}_phone`, phone, 'EX', 5);
 		let authUrl = `${auth_server_url}/realms/${realm_name}/protocol/openid-connect/auth?` + querystring.stringify(params);
