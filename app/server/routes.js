@@ -107,8 +107,8 @@ module.exports = function(app) {
 		try {
 			const tokenResponse = await axios.post(tokenEndpointURL, qs.stringify(requestBody), config)
 			
-			const { access_token } = tokenResponse.data;
-			const token_encode = access_token.split('.')[1];
+			const { id_token } = tokenResponse.data;
+			const token_encode = id_token.split('.')[1];
 			const ascii = Buffer.from(token_encode, 'base64').toString('ascii');
 			const token_info = JSON.parse(ascii);
 			const {phone_number_verified, nonce} = token_info;
