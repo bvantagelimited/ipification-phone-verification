@@ -68,7 +68,7 @@ module.exports = function(app) {
 			nonce: `${nonce}:${phone}`,
 			// login_hint: phone,
 			// deviceid: md5(phone),
-			request: jwt.sign({login_hint: phone, client_id: client_id}, client_secret, {algorithm: 'HS256'}, {typ: 'JWT'})
+			request: jwt.sign({login_hint: phone, client_id: client_id, state: state}, client_secret, {algorithm: 'HS256'}, {typ: 'JWT'})
 		};
 		redisClient.set(`${state}_phone`, phone, 'EX', 5);
 		let authUrl = `${auth_server_url}/realms/${realm_name}/protocol/openid-connect/auth?` + querystring.stringify(params);
