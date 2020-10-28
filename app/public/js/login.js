@@ -23,6 +23,7 @@ $(document).ready(function(){
     var debug = document.getElementById('debug').getAttribute('debug');
 
     if(value && value.length > 0){
+      value = value.replaceAll('+', '')
       window.location.href = window.ROOT_URL + '/authentication?phone=' + value + '&state=' + state + '&debug=' + debug;
     }
   })
