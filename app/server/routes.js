@@ -5,9 +5,10 @@ const qs = require('qs');
 const axios = require("axios");
 const appConfig = require('config');
 const jwt = require('jsonwebtoken');
+const htmlEntities = require('html-entities');
 const _ = require('lodash');
 const ROOT_URL = appConfig.get('root_url');
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 const {promisify} = require('util');
 const redis = require("redis");
 const redisClient = redis.createClient();
@@ -42,7 +43,7 @@ module.exports = function(app) {
 			state: state,
 			phone_number: req.query.phone_number,
 			error_message: req.query.error,
-			error_description: error_description,
+			error_description: htmlEntities.encode(error_description),
 			debug: debug,
 			debug_info: debug_info
 		});
