@@ -125,7 +125,7 @@ module.exports = function(app) {
 				phone_number_verified: phone_number_verified,
 			});
 
-			if(!phone_number_verified){
+			if(phone_number_verified === 'false'){
 				const params = {
 					state: state,
 					phone_number: phone_number,
