@@ -62,7 +62,7 @@ module.exports = function(app) {
 
 		let params = {
 			response_type: 'code',
-			scope: 'openid ip:phone',
+			scope: 'openid ip:phone_verify',
 			client_id: client_id,
 			redirect_uri: redirectClientURL,
 			state: state,
