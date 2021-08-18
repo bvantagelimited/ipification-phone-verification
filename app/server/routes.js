@@ -118,6 +118,7 @@ module.exports = function(app) {
 			const nonce_info = nonce.split(':');
 			const phone_number = nonce_info[1];
 
+			console.log('---> id_token info: ', id_token);
 			console.log('---> token info: ', token_info);
 
 			const debug_info = JSON.stringify({
