@@ -1,6 +1,4 @@
 const querystring = require('querystring');
-const debug = require('debug')('info');
-const request = require('request');
 const qs = require('qs');
 const axios = require("axios");
 const appConfig = require('config');
@@ -13,7 +11,6 @@ const {promisify} = require('util');
 const redis = require("redis");
 const redisClient = redis.createClient();
 const redisGetAsync = promisify(redisClient.get).bind(redisClient);
-const md5 = require('md5');
 
 const auth_server_url = appConfig.get('auth-server-url');
 const realm_name = appConfig.get('realm');
@@ -67,8 +64,6 @@ module.exports = function(app) {
 			redirect_uri: redirectClientURL,
 			state: state,
 			nonce: `${nonce}:${phone}`,
-			// login_hint: phone,
-			// deviceid: md5(phone),
 			request: jwt.sign({login_hint: phone, client_id: client_id, state: state}, client_secret, {algorithm: 'HS256'}, {typ: 'JWT'})
 		};
 		redisClient.set(`${state}_phone`, phone, 'EX', 5);
