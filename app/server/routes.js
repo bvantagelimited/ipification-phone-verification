@@ -56,15 +56,23 @@ module.exports = function(app) {
 		const phone = req.query.phone;
 
 		const redirectClientURL = `${ROOT_URL}/ipification/${debug}/callback`;
+		const scope = 'openid ip:phone_verify';
 
 		let params = {
 			response_type: 'code',
-			scope: 'openid ip:phone_verify',
+			scope: scope,
 			client_id: client_id,
 			redirect_uri: redirectClientURL,
 			state: state,
 			nonce: `${nonce}:${phone}`,
-			request: jwt.sign({login_hint: phone, client_id: client_id, state: state}, client_secret, {algorithm: 'HS256'}, {typ: 'JWT'})
+			request: jwt.sign({
+				login_hint: phone, 
+				client_id: client_id, 
+				state: state,
+				response_type: 'code',
+				redirect_uri: redirectClientURL,
+				scope: scope
+			}, client_secret, {algorithm: 'HS256'}, {typ: 'JWT'})
 		};
 		redisClient.set(`${state}_phone`, phone, 'EX', 5);
 		let authUrl = `${auth_server_url}/realms/${realm_name}/protocol/openid-connect/auth?` + querystring.stringify(params);
