@@ -39,7 +39,6 @@ module.exports = function(app) {
 			page_title: page_title,
 			state: state,
 			phone_number: req.query.phone_number,
-			error_message: req.query.error,
 			error_description: htmlEntities.encode(error_description),
 			debug: debug,
 			debug_info: debug_info
@@ -48,15 +47,12 @@ module.exports = function(app) {
 	});
 
 	app.get('/authentication', (req, res) => {
-		
-		
 		const nonce = uuidv4();
 		const state = req.query.state;
 		const debug = req.query.debug;
-		const phone = req.query.phone;
 
 		const redirectClientURL = `${ROOT_URL}/ipification/${debug}/callback`;
-		const scope = 'openid ip:phone_verify';
+		const scope = 'openid ip:phone';
 
 		let params = {
 			response_type: 'code',
@@ -64,24 +60,14 @@ module.exports = function(app) {
 			client_id: client_id,
 			redirect_uri: redirectClientURL,
 			state: state,
-			nonce: `${nonce}:${phone}`,
-			request: jwt.sign({
-				login_hint: phone, 
-				client_id: client_id, 
-				state: state,
-				response_type: 'code',
-				redirect_uri: redirectClientURL,
-				scope: scope
-			}, client_secret, {algorithm: 'HS256'}, {typ: 'JWT'})
+			nonce: nonce,
+			channel: 'wa viber telegram'
 		};
-		redisClient.set(`${state}_phone`, phone, 'EX', 5);
 		let authUrl = `${auth_server_url}/realms/${realm_name}/protocol/openid-connect/auth?` + querystring.stringify(params);
 		console.log("---> auth url: ", authUrl)
 		res.redirect(authUrl);
 
 	})
-
-	// 381692023534
 
 	app.get('/ipification/:debug/callback', async function(req, res){
 		const state = req.query.state;
@@ -95,8 +81,7 @@ module.exports = function(app) {
 
 		if(req.query.error){
 			console.log('---> kc error: ', req.query.error)
-			const phone_number = await redisGetAsync(`${state}_phone`);
-			res.redirect(`${HomeURL}?state=${state}&phone_number=${phone_number}&error_description=${req.query.error}&error=invalid phone number`);
+			res.redirect(`${HomeURL}?state=${state}&error_description=${req.query.error}`);
 			return;
 		}
 
@@ -117,9 +102,7 @@ module.exports = function(app) {
 			const token_encode = id_token.split('.')[1];
 			const ascii = Buffer.from(token_encode, 'base64').toString('ascii');
 			const token_info = JSON.parse(ascii);
-			const {phone_number_verified, nonce} = token_info;
-			const nonce_info = nonce.split(':');
-			const phone_number = nonce_info[1];
+			const {phone_number_verified, phone_number } = token_info;
 
 			console.log('---> id_token info: ', id_token);
 			console.log('---> token info: ', token_info);
@@ -127,20 +110,6 @@ module.exports = function(app) {
 			const debug_info = JSON.stringify({
 				phone_number_verified: phone_number_verified,
 			});
-
-			if(phone_number_verified === 'false'){
-				const params = {
-					state: state,
-					phone_number: phone_number,
-					error: 'invalid phone number'
-				}
-
-				if(debug == 1) params.debug_info = debug_info;
-
-				const url = HomeURL + '?' + querystring.stringify(params);
-				res.redirect(url);
-				return;
-			}
 
 			const response = {
 				ROOT_URL: ROOT_URL,
@@ -156,16 +125,13 @@ module.exports = function(app) {
 
 		} catch (err) {
 			console.log('---> get token error: ', err.message);
-			const phone_number = await redisGetAsync(`${state}_phone`);
-			res.redirect(`${HomeURL}?phone_number=${phone_number}&error_description=${err.message}`);
+			res.redirect(`${HomeURL}?error_description=${err.message}`);
 		}
 
 		
 	})
-
-	
-	app.get('*', function(req, res) { 
-		res.redirect(`${ROOT_URL}/login`);
-	});
+	// app.get('*', function(req, res) { 
+	// 	res.redirect(`${ROOT_URL}/login`);
+	// });
 
 };

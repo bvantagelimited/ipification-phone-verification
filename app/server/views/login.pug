@@ -3,31 +3,30 @@ extends layout
 
 block content
 	.d-flex.justify-content-center
-		.d-flex.align-items-start.flex-column.login-container
+		.d-flex.align-items-start.flex-column.login-container.valid
 			.mb-auto(style="width: 100%")
 				.app-logo
 					img(src=`${ROOT_URL}/images/landing.svg`)
-			div
-				.app-name
-					.short-title Register with your
-					.title Internet Banking Application
+			.app-name
+				//- .short-title Register with your
+				//- .title Internet Banking Application
 
-					div.login-block
-						.mui-textfield.mui-textfield--float-label
-							input(type='text', value=phone_number)
-							label Phone
-							div.mt-2
-								span.text-danger.error-message
-									= error_message
+				div.login-block
+					//- .mui-textfield.mui-textfield--float-label
+					//- 	input(type='text', value=phone_number)
+					//- 	label Phone
+					//- 	div.mt-2
+					//- 		span.text-danger.error-message
+					//- 			= error_message
 
-						button.btn-login(type='button') Continue
-					div.state-block
-						= state
+					button.btn-login(type='button') IM Login
+				div.state-block
+					= state
 
-					if error_description
-						div.error-block
-							= error_description
-							
-					if debug_info
-						.debug-block
-							= debug_info
+				if error_description
+					div.error-block
+						= error_description
+						
+				if debug_info
+					.debug-block
+						= debug_info
