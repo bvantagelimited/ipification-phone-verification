@@ -7,10 +7,6 @@ const htmlEntities = require('html-entities');
 const _ = require('lodash');
 const ROOT_URL = appConfig.get('root_url');
 const { v4: uuidv4 } = require('uuid');
-const {promisify} = require('util');
-const redis = require("redis");
-const redisClient = redis.createClient();
-const redisGetAsync = promisify(redisClient.get).bind(redisClient);
 
 const auth_server_url = appConfig.get('auth-server-url');
 const realm_name = appConfig.get('realm');
