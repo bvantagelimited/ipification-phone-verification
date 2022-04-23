@@ -1,0 +1,27 @@
+version: "3.3"
+services:
+  redis:
+    image: 'bitnami/redis:latest'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - phone_verify
+  phone_verify:
+    restart: unless-stopped
+    build:
+      context: .
+    image: "ipification-phone-verify"
+    environment:
+      PORT: 8080
+      REDIS_URL: redis://redis
+    ports:
+      - 8082:8080
+    links:
+      - redis
+    depends_on:
+      - redis
+    networks:
+      - phone_verify
+networks:
+  phone_verify:
+    driver: bridge
