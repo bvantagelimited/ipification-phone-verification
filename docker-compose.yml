@@ -5,8 +5,8 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     networks:
-      - phone_verify
-  phone_verify:
+      - app
+  app:
     restart: unless-stopped
     build:
       context: .
@@ -15,13 +15,13 @@ services:
       PORT: 8080
       REDIS_URL: redis://redis
     ports:
-      - 8082:8080
+      - 8004:8080
     links:
       - redis
     depends_on:
       - redis
     networks:
-      - phone_verify
+      - app
 networks:
-  phone_verify:
+  app:
     driver: bridge
