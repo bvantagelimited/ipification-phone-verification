@@ -9,7 +9,7 @@ const ROOT_URL = appConfig.get('root_url');
 const { v4: uuidv4 } = require('uuid');
 const {promisify} = require('util');
 const redis = require("redis");
-const redisClient = redis.createClient();
+const redisClient = redis.createClient({ url: process.env.REDIS_URL });
 const redisGetAsync = promisify(redisClient.get).bind(redisClient);
 
 const auth_server_url = appConfig.get('auth-server-url');
