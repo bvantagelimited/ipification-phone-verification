@@ -7,11 +7,7 @@ const htmlEntities = require('html-entities');
 const _ = require('lodash');
 const ROOT_URL = appConfig.get('root_url');
 const { v4: uuidv4 } = require('uuid');
-const {promisify} = require('util');
 const redis = require("redis");
-const redisClient = redis.createClient({ url: process.env.REDIS_URL });
-const redisGetAsync = promisify(redisClient.get).bind(redisClient);
-
 const auth_server_url = appConfig.get('auth-server-url');
 const realm_name = appConfig.get('realm');
 const client_id = appConfig.get('client_id');
@@ -19,6 +15,12 @@ const client_secret = appConfig.get('client_secret');
 const page_title = appConfig.get('page_title');
 
 const HomeURL = `${ROOT_URL}/login`;
+
+const getRedisClient = async () => {
+	return await redis.createClient({ url: process.env.REDIS_URL })
+  .on('error', err => console.log('Redis Client Error', err))
+  .connect();
+}
 
 module.exports = function(app) {
 
@@ -28,12 +30,12 @@ module.exports = function(app) {
 
 	// main login page //
 	app.get('/login', async (req, res) => {
-		
+
 		const error_description = req.query.error_description;
 		const state = req.query.state || uuidv4();
 		const debug = req.query.debug || 0;
 		const debug_info = req.query.debug_info;
-		
+
 		res.render('login', {
 			ROOT_URL: ROOT_URL,
 			page_title: page_title,
@@ -44,19 +46,27 @@ module.exports = function(app) {
 			debug: debug,
 			debug_info: debug_info
 		});
-		
+
 	});
 
-	app.get('/authentication', (req, res) => {
-		
-		
+	app.get('/authentication', async (req, res) => {
 		const nonce = uuidv4();
+		const redisClient = await getRedisClient();
 		const state = req.query.state;
 		const debug = req.query.debug;
 		const phone = req.query.phone;
 
 		const redirectClientURL = `${ROOT_URL}/ipification/${debug}/callback`;
 		const scope = 'openid ip:phone_verify';
+
+		const request = await jwt.sign({
+			login_hint: phone,
+			client_id: client_id,
+			state: state,
+			response_type: 'code',
+			redirect_uri: redirectClientURL,
+			scope: scope
+		}, client_secret, {algorithm: 'HS256'})
 
 		let params = {
 			response_type: 'code',
@@ -65,16 +75,9 @@ module.exports = function(app) {
 			redirect_uri: redirectClientURL,
 			state: state,
 			nonce: `${nonce}:${phone}`,
-			request: jwt.sign({
-				login_hint: phone, 
-				client_id: client_id, 
-				state: state,
-				response_type: 'code',
-				redirect_uri: redirectClientURL,
-				scope: scope
-			}, client_secret, {algorithm: 'HS256'}, {typ: 'JWT'})
+			request: request
 		};
-		redisClient.set(`${state}_phone`, phone, 'EX', 5);
+		await redisClient.set(`${state}_phone`, phone, 'EX', 5);
 		let authUrl = `${auth_server_url}/realms/${realm_name}/protocol/openid-connect/auth?` + querystring.stringify(params);
 		console.log("---> auth url: ", authUrl)
 		res.redirect(authUrl);
@@ -84,6 +87,7 @@ module.exports = function(app) {
 	// 381692023534
 
 	app.get('/ipification/:debug/callback', async function(req, res){
+		const redisClient = await getRedisClient();
 		const state = req.query.state;
 		const debug = req.params.debug;
 
@@ -95,7 +99,7 @@ module.exports = function(app) {
 
 		if(req.query.error){
 			console.log('---> kc error: ', req.query.error)
-			const phone_number = await redisGetAsync(`${state}_phone`);
+			const phone_number = await redisClient.get(`${state}_phone`);
 			res.redirect(`${HomeURL}?state=${state}&phone_number=${phone_number}&error_description=${req.query.error}&error=invalid phone number`);
 			return;
 		}
@@ -112,7 +116,7 @@ module.exports = function(app) {
 
 		try {
 			const tokenResponse = await axios.post(tokenEndpointURL, qs.stringify(requestBody), config)
-			
+
 			const { id_token } = tokenResponse.data;
 			const token_encode = id_token.split('.')[1];
 			const ascii = Buffer.from(token_encode, 'base64').toString('ascii');
@@ -156,15 +160,15 @@ module.exports = function(app) {
 
 		} catch (err) {
 			console.log('---> get token error: ', err.message);
-			const phone_number = await redisGetAsync(`${state}_phone`);
+			const phone_number = await redisClient.get(`${state}_phone`);
 			res.redirect(`${HomeURL}?phone_number=${phone_number}&error_description=${err.message}`);
 		}
 
-		
+
 	})
 
-	
-	app.get('*', function(req, res) { 
+
+	app.get('*', function(req, res) {
 		res.redirect(`${ROOT_URL}/login`);
 	});
 
